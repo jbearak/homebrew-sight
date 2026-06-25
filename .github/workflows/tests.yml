@@ -1,0 +1,43 @@
+name: tests
+
+# Gates every PR (including the automated bump PRs from jbearak/sight) by
+# actually auditing, installing, and running the formula on Apple Silicon
+# before it can merge. A formula that doesn't install never reaches users.
+#
+# Mark this workflow as a required status check on the `main` branch
+# (Settings > Branches) so bump PRs can't merge red.
+#
+# Homebrew/actions/setup-homebrew auto-taps the checked-out repo as
+# jbearak/sight, so there is intentionally no explicit `brew tap` step.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    # macos-latest tracks the newest stable runner image, which is Apple
+    # Silicon (arm64) — matching the arm64-only formula.
+    runs-on: macos-latest
+    steps:
+      - name: Checkout tap
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@main
+
+      - name: Audit
+        run: brew audit --strict --online jbearak/sight/sight
+
+      - name: Install
+        run: brew install --verbose jbearak/sight/sight
+
+      - name: Test
+        run: brew test --verbose jbearak/sight/sight
+
+      - name: Smoke check
+        run: sight --version
