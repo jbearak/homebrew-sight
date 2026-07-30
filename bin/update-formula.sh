@@ -26,16 +26,16 @@ sha() {
 SHA="$(sha "$BIN")"
 [[ "$SHA" =~ ^[0-9a-f]{64}$ ]] || { echo "not a sha256: $SHA" >&2; exit 1; }
 
-# Version appears in `version "..."` and in the download URL path.
+# Homebrew infers the version from the release tag in the URL. An explicit
+# `version` field is redundant and rejected by `brew audit --strict`.
 perl -0pi -e "s{/download/v[0-9][^/]*/}{/download/v$VERSION/}g" "$FORMULA"
-perl -0pi -e "s/^  version \"[^\"]+\"/  version \"$VERSION\"/m" "$FORMULA"
 # Single arch ⇒ exactly one sha256 line; replace it directly.
 perl -pi -e "s/^  sha256 \"[0-9a-f]{64}\"/  sha256 \"$SHA\"/" "$FORMULA"
 
 # Post-conditions — any failure means the formula shape changed; do not ship it.
 err=0
-[[ "$(grep -c "version \"$VERSION\"" "$FORMULA")" -eq 1 ]] || { echo "version not set exactly once" >&2; err=1; }
 [[ "$(grep -c "download/v$VERSION/" "$FORMULA")" -eq 1 ]] || { echo "expected exactly 1 versioned URL" >&2; err=1; }
+[[ "$(grep -cE '^  version ' "$FORMULA")" -eq 0 ]] || { echo "explicit version must be omitted; Homebrew infers it from the URL" >&2; err=1; }
 [[ "$(grep -cE '^  sha256 ' "$FORMULA")" -eq 1 ]] || { echo "expected exactly 1 sha256 line" >&2; err=1; }
 grep -q "$SHA" "$FORMULA" || { echo "sha256 not written" >&2; err=1; }
 ! grep -q "0000000000000000000000000000000000000000000000000000000000000000" "$FORMULA" || { echo "placeholder sha256 still present" >&2; err=1; }
