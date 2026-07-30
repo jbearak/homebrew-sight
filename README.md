@@ -49,8 +49,10 @@ The `bump-homebrew` job in [`jbearak/sight`](https://github.com/jbearak/sight)
 runs after each `v*` release is published, recomputes the Apple Silicon sha256
 from the release artifact, and opens a **PR** against this repo bumping
 the versioned URL and checksum. Homebrew infers the formula version from the
-release tag in that URL. CI on the PR (`brew audit`/`install`/`test`) must pass
-before it merges — a broken formula never reaches users via a silent push.
+release tag and matching `version` query parameter in that URL; the query keeps
+older Homebrew versions from mistaking the `64` in the asset name for the
+formula version. CI on the PR (`brew audit`/`install`/`test`) must pass before it
+merges — a broken formula never reaches users via a silent push.
 
 ## Rollback / bad release
 
