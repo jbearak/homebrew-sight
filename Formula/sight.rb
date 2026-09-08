@@ -8,8 +8,8 @@
 class Sight < Formula
   desc "Static analyzer and language server for Stata"
   homepage "https://github.com/jbearak/sight"
-  url "https://github.com/jbearak/sight/releases/download/v0.14.3/sight-darwin-arm64?version=0.14.3"
-  sha256 "e5962efc611010778f16e906fa2c6fbf6223e097c3d8a37be56ac3e4acb117d8"
+  url "https://github.com/jbearak/sight/releases/download/v0.14.4/sight-darwin-arm64?version=0.14.4"
+  sha256 "115ee43a4b4d022d153db0afed2e78c638dd1c91bf8240201881577ef096db96"
   license "GPL-3.0-or-later"
 
   # Drives `brew livecheck` / `brew bump` off the upstream GitHub releases.
